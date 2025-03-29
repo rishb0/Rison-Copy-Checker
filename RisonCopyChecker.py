@@ -11,6 +11,8 @@ sys.path.insert(0, current_dir)
 # Import the main application class
 from src.ui.main_window import RisonCopyChecker
 from src.ui.report_generator import generate_markdown_report
+from src.ui.api_key_dialog import ApiKeyDialog
+from src.utils.api_key_manager import ApiKeyManager
 
 class MarkdownReportViewer(QtWidgets.QWidget):
     """A window for displaying Markdown reports"""
@@ -149,6 +151,80 @@ class EnhancedRisonCopyChecker(RisonCopyChecker):
         # Center all buttons
         self.center_ui_elements()
         
+        # Add a menu bar with API key management
+        self.setup_menu_bar()
+        
+        # Check for API key on startup
+        self.check_api_key()
+        
+    def setup_menu_bar(self):
+        """Create a menu bar with settings options"""
+        # Create menu bar
+        menu_bar = QtWidgets.QMenuBar(self)
+        self.layout().setMenuBar(menu_bar)
+        
+        # Create Settings menu
+        settings_menu = menu_bar.addMenu("Settings")
+        
+        # Add API Key action
+        api_key_action = QtWidgets.QAction("Manage API Key", self)
+        api_key_action.triggered.connect(self.show_api_key_dialog)
+        settings_menu.addAction(api_key_action)
+        
+    def show_api_key_dialog(self):
+        """Show the API key dialog to update the API key"""
+        current_key = ApiKeyManager.get_api_key()
+        dialog = ApiKeyDialog(self, current_key)
+        
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            # Get the API key from the dialog
+            api_key = dialog.get_api_key()
+            if api_key:
+                # Save the API key
+                ApiKeyManager.save_api_key(api_key, dialog.should_save_key())
+                if hasattr(self, 'status_box'):
+                    self.status_box.setText("API Key Updated")
+                    self.status_box.setStyleSheet("background-color: #002021; color: #28C76F; padding: 20px; border-radius: 0px;")
+                QtWidgets.QMessageBox.information(self, "API Key Updated", "Your API key has been updated successfully!")
+        
+    def check_api_key(self):
+        """Check if API key exists and prompt user if not"""
+        api_key = ApiKeyManager.get_api_key()
+        if not api_key:
+            if hasattr(self, 'status_box'):
+                self.status_box.setText("API Key Required")
+                self.status_box.setStyleSheet("background-color: #002021; color: #FF9500; padding: 20px; border-radius: 0px;")
+            
+            # Show welcome message with API key information
+            QtWidgets.QMessageBox.information(
+                self, 
+                "Welcome to Rison Copy Checker", 
+                "Welcome to Rison Copy Checker!\n\n"
+                "This application uses Google's Gemini API to analyze exam papers.\n"
+                "You'll need to provide your own API key from Google AI Studio.\n\n"
+                "Click OK to enter your API key."
+            )
+            
+            # Show the API key dialog
+            dialog = ApiKeyDialog(self)
+            if dialog.exec_() == QtWidgets.QDialog.Accepted:
+                # Get the API key from the dialog
+                api_key = dialog.get_api_key()
+                if api_key:
+                    # Save the API key
+                    ApiKeyManager.save_api_key(api_key, dialog.should_save_key())
+                    if hasattr(self, 'status_box'):
+                        self.status_box.setText("API Key Saved")
+                        self.status_box.setStyleSheet("background-color: #002021; color: #28C76F; padding: 20px; border-radius: 0px;")
+                else:
+                    if hasattr(self, 'status_box'):
+                        self.status_box.setText("No API Key Provided")
+                        self.status_box.setStyleSheet("background-color: #002021; color: #FF9500; padding: 20px; border-radius: 0px;")
+            else:
+                if hasattr(self, 'status_box'):
+                    self.status_box.setText("No API Key Provided")
+                    self.status_box.setStyleSheet("background-color: #002021; color: #FF9500; padding: 20px; border-radius: 0px;")
+        
     def clear_selections(self):
         """Override clear_selections to reset the status panel as well"""
         # Call the parent method to clear selections
@@ -156,8 +232,8 @@ class EnhancedRisonCopyChecker(RisonCopyChecker):
         
         # Reset status panel
         if hasattr(self, 'status_box'):
-            self.status_box.setText("Ready")
-            self.status_box.setStyleSheet("background-color: #97F4FC; color: #000000; padding: 20px; border: 2px solid #052123; border-radius: 5px;")
+            self.status_box.setText("Idle")
+            self.status_box.setStyleSheet("background-color: #002021; color: #FFFFFF; padding: 20px; border-radius: 0px;")
             self.status_progress.setValue(0)
             self.status_progress.setVisible(False)
             
@@ -169,7 +245,7 @@ class EnhancedRisonCopyChecker(RisonCopyChecker):
         # Update status panel
         if hasattr(self, 'status_box') and self.pdf_paths["Question Paper"]:
             self.status_box.setText(f"Question Paper uploaded:\n{os.path.basename(self.pdf_paths['Question Paper'])}")
-            self.status_box.setStyleSheet("background-color: #97F4FC; color: #000000; padding: 20px; border: 2px solid #052123; border-radius: 5px;")
+            self.status_box.setStyleSheet("background-color: #002021; color: #FFFFFF; padding: 20px; border-radius: 0px;")
             
     def upload_answer_pdf(self):
         """Override upload_answer_pdf to update status panel"""
@@ -179,7 +255,7 @@ class EnhancedRisonCopyChecker(RisonCopyChecker):
         # Update status panel
         if hasattr(self, 'status_box') and self.pdf_paths["Actual Answer"]:
             self.status_box.setText(f"Answer Sheet uploaded:\n{os.path.basename(self.pdf_paths['Actual Answer'])}")
-            self.status_box.setStyleSheet("background-color: #97F4FC; color: #000000; padding: 20px; border: 2px solid #052123; border-radius: 5px;")
+            self.status_box.setStyleSheet("background-color: #002021; color: #FFFFFF; padding: 20px; border-radius: 0px;")
             
     def upload_reference_pdf(self):
         """Override upload_reference_pdf to update status panel"""
@@ -189,7 +265,7 @@ class EnhancedRisonCopyChecker(RisonCopyChecker):
         # Update status panel
         if hasattr(self, 'status_box') and self.pdf_paths["Reference Answer"]:
             self.status_box.setText(f"Reference Answer uploaded:\n{os.path.basename(self.pdf_paths['Reference Answer'])}")
-            self.status_box.setStyleSheet("background-color: #97F4FC; color: #000000; padding: 20px; border: 2px solid #052123; border-radius: 5px;")
+            self.status_box.setStyleSheet("background-color: #002021; color: #FFFFFF; padding: 20px; border-radius: 0px;")
         
     def center_ui_elements(self):
         """Center all buttons and UI elements"""
@@ -217,20 +293,42 @@ class EnhancedRisonCopyChecker(RisonCopyChecker):
             QtWidgets.QMessageBox.warning(self, "Missing Files", "Please upload a Question Paper PDF.")
             if hasattr(self, 'status_box'):
                 self.status_box.setText("Missing Question Paper")
-                self.status_box.setStyleSheet("background-color: #97F4FC; color: #FF0000; padding: 20px; border: 2px solid #FF0000; border-radius: 5px;")
+                self.status_box.setStyleSheet("background-color: #002021; color: #FF0000; padding: 20px; border-radius: 0px;")
             return
             
         if not self.pdf_paths["Actual Answer"]:
             QtWidgets.QMessageBox.warning(self, "Missing Files", "Please upload an Answer Sheet PDF.")
             if hasattr(self, 'status_box'):
                 self.status_box.setText("Missing Answer Sheet")
-                self.status_box.setStyleSheet("background-color: #97F4FC; color: #FF0000; padding: 20px; border: 2px solid #FF0000; border-radius: 5px;")
+                self.status_box.setStyleSheet("background-color: #002021; color: #FF0000; padding: 20px; border-radius: 0px;")
             return
+        
+        # Check for API key and prompt if not available
+        api_key = ApiKeyManager.get_api_key()
+        if not api_key:
+            if hasattr(self, 'status_box'):
+                self.status_box.setText("API Key Required")
+                self.status_box.setStyleSheet("background-color: #002021; color: #FF9500; padding: 20px; border-radius: 0px;")
+            
+            # Show the API key dialog
+            dialog = ApiKeyDialog(self)
+            if dialog.exec_() == QtWidgets.QDialog.Accepted:
+                # Get the API key from the dialog
+                api_key = dialog.get_api_key()
+                if api_key:
+                    # Save the API key
+                    ApiKeyManager.save_api_key(api_key, dialog.should_save_key())
+                else:
+                    QtWidgets.QMessageBox.warning(self, "Missing API Key", "An API key is required to use this application.")
+                    return
+            else:
+                # User cancelled the dialog
+                return
         
         # Update our status panel
         if hasattr(self, 'status_box'):
             self.status_box.setText("Processing PDFs... 10%")
-            self.status_box.setStyleSheet("background-color: #97F4FC; color: #000000; padding: 20px; border: 2px solid #052123; border-radius: 5px;")
+            self.status_box.setStyleSheet("background-color: #002021; color: #FFFFFF; padding: 20px; border-radius: 0px;")
             self.status_progress.setValue(10)
             self.status_progress.setVisible(True)
             
@@ -273,15 +371,18 @@ class EnhancedRisonCopyChecker(RisonCopyChecker):
         status_title = QtWidgets.QLabel("Status")
         status_title.setFont(QtGui.QFont("Arial", 14, QtGui.QFont.Bold))
         status_title.setAlignment(QtCore.Qt.AlignCenter)
-        status_title.setStyleSheet("background-color: #052123; color: #FFFFFF; padding: 10px;")
+        status_title.setStyleSheet("background-color: #002021; color: #FFFFFF; padding: 10px;")
         status_layout.addWidget(status_title)
+        
+        # Add some spacing between title and status box
+        status_layout.addSpacing(10)
         
         # Add status content box
         self.status_box = QtWidgets.QLabel("Idle")
-        self.status_box.setFont(QtGui.QFont("Arial", 12))
+        self.status_box.setFont(QtGui.QFont("Arial", 14))
         self.status_box.setAlignment(QtCore.Qt.AlignCenter)
-        self.status_box.setStyleSheet("background-color: #97F4FC; color: #000000; padding: 20px; border: 2px solid #052123; border-radius: 5px;")
-        self.status_box.setMinimumHeight(100)
+        self.status_box.setStyleSheet("background-color: #002021; color: #FFFFFF; padding: 20px; border-radius: 0px;")
+        self.status_box.setMinimumHeight(180)  # Make it taller to match reference
         status_layout.addWidget(self.status_box)
         
         # Add progress bar
@@ -340,7 +441,7 @@ class EnhancedRisonCopyChecker(RisonCopyChecker):
         # Update status panel
         if hasattr(self, 'status_box'):
             self.status_box.setText("Analysis complete!")
-            self.status_box.setStyleSheet("background-color: #97F4FC; color: #052123; padding: 20px; border: 2px solid #28C76F; border-radius: 5px;")
+            self.status_box.setStyleSheet("background-color: #002021; color: #28C76F; padding: 20px; border-radius: 0px;")
             
     def handle_error(self, error_message):
         """Override handle_error to update our status panel"""
@@ -350,7 +451,7 @@ class EnhancedRisonCopyChecker(RisonCopyChecker):
         # Update status panel
         if hasattr(self, 'status_box'):
             self.status_box.setText(f"Error: {error_message}")
-            self.status_box.setStyleSheet("background-color: #97F4FC; color: #FF0000; padding: 20px; border: 2px solid #FF0000; border-radius: 5px;")
+            self.status_box.setStyleSheet("background-color: #002021; color: #FF0000; padding: 20px; border-radius: 0px;")
             self.status_progress.setVisible(False)
         
         # Close the progress dialog if it exists
@@ -380,7 +481,7 @@ class EnhancedRisonCopyChecker(RisonCopyChecker):
             # Update status panel with success message
             if hasattr(self, 'status_box'):
                 self.status_box.setText(f"Report saved to:\n{os.path.basename(report_path)}")
-                self.status_box.setStyleSheet("background-color: #97F4FC; color: #052123; padding: 20px; border: 2px solid #28C76F; border-radius: 5px;")
+                self.status_box.setStyleSheet("background-color: #002021; color: #28C76F; padding: 20px; border-radius: 0px;")
             
             # Show completion message with option to view report
             msg_box = QtWidgets.QMessageBox()
@@ -398,7 +499,7 @@ class EnhancedRisonCopyChecker(RisonCopyChecker):
             # Update status panel with error message
             if hasattr(self, 'status_box'):
                 self.status_box.setText(f"Error generating report: {str(e)}")
-                self.status_box.setStyleSheet("background-color: #97F4FC; color: #FF0000; padding: 20px; border: 2px solid #FF0000; border-radius: 5px;")
+                self.status_box.setStyleSheet("background-color: #002021; color: #FF0000; padding: 20px; border-radius: 0px;")
                 
             QtWidgets.QMessageBox.critical(self, "Error", f"An error occurred when generating the report: {str(e)}")
 

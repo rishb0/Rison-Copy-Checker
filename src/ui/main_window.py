@@ -63,11 +63,25 @@ class RisonCopyChecker(QtWidgets.QWidget):
         button_font = QtGui.QFont("Arial", 12)
         label_font = QtGui.QFont("Arial", 12)
 
+        # Main title with "by RS" watermark
+        title_layout = QtWidgets.QHBoxLayout()
+        
         title_label = QtWidgets.QLabel("Rison Copy Checker", self)
         title_label.setFont(title_font)
         title_label.setStyleSheet("background-color: #052123; color:#FFFFFF;")
         title_label.setAlignment(QtCore.Qt.AlignCenter)
-        layout.addWidget(title_label)
+        
+        # Add "by RS" in smaller font with right alignment
+        by_rs_label = QtWidgets.QLabel("by RS", self)
+        by_rs_label.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.StyleItalic))
+        by_rs_label.setStyleSheet("background-color: #052123; color:#28C76F;")
+        by_rs_label.setAlignment(QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight)
+        
+        # Add to layout with proper stretching
+        title_layout.addWidget(title_label, 9)  # 90% width
+        title_layout.addWidget(by_rs_label, 1)  # 10% width
+        
+        layout.addLayout(title_layout)
 
         # Video Background
         video_path = "attached_assets/HDRobotVideo.mp4"
@@ -251,8 +265,10 @@ class RisonCopyChecker(QtWidgets.QWidget):
         self.progress.show()
         self.progress.setValue(10)
 
-        # Get the API key from environment variable, with a fallback default key
-        api_key = os.getenv("GEMINI_API_KEY", "AIzaSyDPuEDz-SY2gCRStIC1TOCf-GUyg477dZ0")
+        # Get the API key from our API key manager
+        # Note: This works because our enhanced class checks for API key before calling super().start_checking()
+        from src.utils.api_key_manager import ApiKeyManager
+        api_key = ApiKeyManager.get_api_key()
         
         # Construct the prompt for the Gemini API
         prompt = self.construct_prompt()
