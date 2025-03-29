@@ -1,5 +1,0 @@
-PyQt5
-PyMuPDF
-Pillow
-google-generativeai
-opencv-python
