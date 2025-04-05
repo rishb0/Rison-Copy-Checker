@@ -48,11 +48,13 @@ class RisonCopyChecker(QtWidgets.QWidget):
         
         # Set window size based on screen dimensions
         screen = QtWidgets.QDesktopWidget().screenGeometry()
-        window_width = int(screen.width() * 0.4)  
-        window_height = int(screen.height() * 0.7)
-        x = int((screen.width() - window_width) / 2)
-        y = int(screen.height() * 0.05)
-        self.setGeometry(x, y, window_width, window_height)
+        window_width = int(screen.width())  
+        window_height = int(screen.height())
+        self.setGeometry(0, 0, window_width, window_height)
+        # window_width = int(screen.width() * 0.4)  
+        # window_height = int(screen.height() * 0.7)
+        # x = int((screen.width() - window_width) / 2)
+        # y = int(screen.height() * 0.05)
 
         self.setWindowTitle("Rison Copy Checker")
         self.setStyleSheet("background-color: #97F4FC;")
@@ -71,15 +73,10 @@ class RisonCopyChecker(QtWidgets.QWidget):
         title_label.setStyleSheet("background-color: #052123; color:#FFFFFF;")
         title_label.setAlignment(QtCore.Qt.AlignCenter)
         
-        # Add "by RS" in smaller font with right alignment
-        by_rs_label = QtWidgets.QLabel("by RS", self)
-        by_rs_label.setFont(QtGui.QFont("Arial", 10, QtGui.QFont.StyleItalic))
-        by_rs_label.setStyleSheet("background-color: #052123; color:#28C76F;")
-        by_rs_label.setAlignment(QtCore.Qt.AlignBottom | QtCore.Qt.AlignRight)
         
-        # Add to layout with proper stretching
+        # # Add to layout with proper stretching
         title_layout.addWidget(title_label, 9)  # 90% width
-        title_layout.addWidget(by_rs_label, 1)  # 10% width
+        # title_layout.addWidget(by_rs_label, 1)  # 10% width
         
         layout.addLayout(title_layout)
 
@@ -90,8 +87,8 @@ class RisonCopyChecker(QtWidgets.QWidget):
         self.video_label = QtWidgets.QLabel(self)
         self.video_label.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.video_label.setScaledContents(True)
-        video_width = int(window_width)
-        video_height = int(window_height * 0.85)
+        video_width = int(window_width * 0.4)
+        video_height = int(window_height * 0.6)
         self.video_label.setFixedSize(video_width, video_height)
         
         # Display the first frame of the video
