@@ -256,11 +256,11 @@ class RisonCopyChecker(QtWidgets.QWidget):
             return
 
         # Set up a progress dialog
-        self.progress = QtWidgets.QProgressDialog("Processing PDFs...", "Cancel", 0, 100, self)
-        self.progress.setWindowTitle("Please Wait")
-        self.progress.setWindowModality(QtCore.Qt.WindowModal)
-        self.progress.show()
-        self.progress.setValue(10)
+        # self.progress = QtWidgets.QProgressDialog("Processing PDFs...", "Cancel", 0, 100, self)
+        # self.progress.setWindowTitle("Please Wait")
+        # self.progress.setWindowModality(QtCore.Qt.WindowModal)
+        # self.progress.show()
+        # self.progress.setValue(10)
 
         # Get the API key from our API key manager
         # Note: This works because our enhanced class checks for API key before calling super().start_checking()
