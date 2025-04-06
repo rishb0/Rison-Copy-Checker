@@ -29,30 +29,30 @@ Alternatively, you can manually install the dependencies by running the followin
 ```
 pip install -r requirements.txt
 ```
-
+or
+```
+pip install PyQt5>=5.15.4 PyQtWebEngine>=5.15.4 PyMuPDF>=1.19.5 Pillow>=9.0.0 google-generativeai>=0.3.0 opencv-python>=4.5.5 markdown>=3.3.6 python-docx>=0.8.11 python-pptx>=0.6.20 cairosvg>=2.5.2 numpy>=1.22.0 reportlab>=3.6.6
+```
 ### Step 3: API Key
 
-To use the Gemini API, you need an API key. Replace the existing API key in the `RisonCC.py` file with your own key.
+To use the Gemini API, you need an API key. Enter the API key when you firstime run the `RisonCopyChecker.py` 
 
 To get the API-KEY visit : https://aistudio.google.com/apikey
 
 ## Usage
 
 1. Ensure your machine is connected to the internet.
-2. Open the `RisonCC.py` file in your terminal or Visual Studio Code.
+2. Open the `RisonCopyChecker.py` file in your terminal or Visual Studio Code.
 3. Run the project by executing the following command:
 
 ```
-python RisonCC.py
+python RisonCopyChecker.py
 ```
 
 4. The GUI will open. Upload the **question paper PDF**, **answer sheet PDF**, and optionally a **reference marking scheme**.
 5. Click on **Start Checking**. The program will analyze the answer sheet and generate a report with correctness, marks, and detailed analysis for each question.
 6. The time taken for the analysis will depend on the size of the PDF files and the speed of your internet connection.
 
-## License
-
-This project uses the **Gemini API** for analysis, which requires an API key. As this API is free to use, there is no additional licensing required for the project itself.
 
 ## Contact
 
