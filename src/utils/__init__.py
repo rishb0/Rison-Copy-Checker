@@ -1,1 +1,0 @@
-# Utils package for Rison Copy Checker
