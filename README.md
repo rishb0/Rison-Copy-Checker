@@ -60,4 +60,4 @@ For any inquiries or issues, please feel free to reach out via GitHub: [@rishb0]
 
 ## Screenshots
 
-![GUI Look](GUI-screenshot.png)
+![GUI Look](attached_assets/GUI-screenshot.png)
