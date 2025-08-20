@@ -58,7 +58,7 @@ class PDFProcessor:
         return parts
 
     def generate_response(self, parts):
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-2.5-flash')
         response = model.generate_content(parts)
         return response.text
 
